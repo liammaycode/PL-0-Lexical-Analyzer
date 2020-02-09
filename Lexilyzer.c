@@ -49,8 +49,11 @@ int main(int argc, char **argv)
   while (!feof(fp))
   {
     fscanf(fp, "%c", &source[i++]);
-    //i think we should print the outcomehere
-    puts(source);
+    
+    //i think we should print the outcome here
+    //fgets(source, MAX_CODE_LENGTH, fp);
+    //puts(source);
+    //just saw the printf below so nevermind but ill leave this in the comments 
   }
   printf("Source Program:\n%s\n", source);
 
