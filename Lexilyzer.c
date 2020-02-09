@@ -49,6 +49,8 @@ int main(int argc, char **argv)
   while (!feof(fp))
   {
     fscanf(fp, "%c", &source[i++]);
+    //i think we should print the outcomehere
+    puts(source);
   }
   printf("Source Program:\n%s\n", source);
 
