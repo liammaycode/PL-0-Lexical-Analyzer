@@ -3,13 +3,6 @@
 // COP 3402
 // Spring 2020
 
-// This program is an implementation of a lexical analyzer for PL/0
-// [ ] means an optional item,
-// { } means repeat 0 or more times.
-// Terminal symbols are enclosed in quote marks.
-// A period is used to indicate the end of the definition of a syntactic class.
-// Comments and invisible characters are ignored
-
 #include <stdio.h>
 
 #define MAX_IDENT_LENGTH 11
@@ -26,14 +19,47 @@ ifsym = 23, thensym = 24, whilesym = 25, dosym = 26, callsym = 27, constsym = 28
 varsym = 29, procsym = 30, writesym = 31, readsym = 32 , elsesym = 33
 } token_type;
 
-// Table of reserved word names
-char reserved[14][9] = { "const", "var", "procedure", "call", "begin", "end",
-                         "if", "then", "else", "while", "do", "read", "write",
-                         "odd" };
+void parseSource(char *src, char *lexemeList);
+void trim(char *str);
 
-// Table of special symbols
-char symbols[13] = { '+', '-', '*', '/', '(', ')', '=', ',', '.', '<', '>', ';',
-                     ':' };
+// gets rid of comments by overwriting all character within the comments and the
+// comment markers themselves
+void trim(char *str)
+{
+  int lp = 0, rp, diff, i, len = strlen(str);
+  while (str[lp] != '\0')
+  {
+    if (str[lp] == '/' && str[lp + 1] == '*')
+    {
+      rp = lp + 2;
+      while (str[rp] != '*' && str[rp + 1] != '/')
+      {
+        rp++;
+      }
+      rp += 2;
+
+      diff = rp - lp;
+      for (i = 0; i < diff; i++)
+      {
+        str[lp + i] = str[rp + i + 1];
+      }
+    }
+    lp++;
+  }
+}
+
+void parseSource(char *src, char *lexemeList)
+{
+  // Table of reserved word names
+  char reserved[14][9] = { "const", "var", "procedure", "call", "begin", "end",
+                           "if", "then", "else", "while", "do", "read", "write",
+                           "odd" };
+  // Table of special symbols
+  char symbols[13] = { '+', '-', '*', '/', '(', ')', '=', ',', '.', '<', '>', ';',
+                       ':' };
+
+  trim(src);
+}
 
 int main(int argc, char **argv)
 {
@@ -42,20 +68,19 @@ int main(int argc, char **argv)
   // {
   //   printf("%s\n", reserved[i]);
   // }
-  char source[MAX_CODE_LENGTH];
+  char source[MAX_CODE_LENGTH], lexemeList[MAX_CODE_LENGTH];
   FILE *fp = fopen(argv[1], "r");
   int i = 0;
 
+  // collecting source program from file
   while (!feof(fp))
   {
     fscanf(fp, "%c", &source[i++]);
-    
-    //i think we should print the outcome here
-    //fgets(source, MAX_CODE_LENGTH, fp);
-    //puts(source);
-    //just saw the printf below so nevermind but ill leave this in the comments 
   }
   printf("Source Program:\n%s\n", source);
 
+  parseSource(source, lexemeList);
+
   return 0;
 }
+
