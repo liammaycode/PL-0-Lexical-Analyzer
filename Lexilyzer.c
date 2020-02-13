@@ -3,6 +3,11 @@
 // COP 3402
 // Spring 2020
 
+//formula that will come in handy 
+//H(id) = ord (first letter) + ord (last letter)
+//will output a numerical value for the identifier
+
+
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h> // for booleans
@@ -12,6 +17,7 @@
 #define MAX_IDENT_LENGTH 11
 #define MAX_NUM_LENGTH 5
 #define MAX_CODE_LENGTH 550
+#define symbol_ table [MAX_NAME_TABLE_SIZE] 
 
 // Defines token types and their initial values
 typedef enum {
@@ -27,7 +33,16 @@ typedef struct lexemes
 {
   token_type type;
   char *lexeme;
-}lexeme;
+} lexeme;
+
+typedef struct namerecords_t     
+{ 
+  int kind; 
+  char name[10];
+  int val;
+  int level;
+  int adr;   
+} namerecord_t; 
 
 lexeme *createLexeme(token_type t, char *str)
 {
@@ -80,6 +95,9 @@ void parseSource(char *src, char *lexemeList)
   while ()
 }
 
+
+
+
 // returns true if the string is a valid identifier and false otherwise
 bool isIdentifier(char *str)
 {
@@ -126,6 +144,13 @@ bool isReserved(char *str)
   char reserved[14][9] = { "const", "var", "procedure", "call", "begin", "end",
                            "if", "then", "else", "while", "do", "read", "write",
                            "odd" };
+
+
+  int ssym[256] = { ssym['+'] = plus, ssym['-']=minus, ssym['*']=mult, ssym['/']
+                  = slash, ssym['(']=lparen, ssym[')']=rparen, ssym['=']=eql,
+                   ssym[',']=comma, ssym['.']=period, 
+                   ssym['#']=neq, ssym['<']=lss, ssym['>']=gtr, ssym['$']=leq,
+                   ssym['%']=geq, ssym[';']=semicolon }; 
   if (str[0] == 'b')
   {
     if (strcmp(reserved[4], str) == 0)
@@ -242,4 +267,3 @@ int main(int argc, char **argv)
 
   return 0;
 }
-
