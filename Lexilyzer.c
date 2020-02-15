@@ -38,18 +38,24 @@ lexeme *createLexeme(token_type t, char *str)
 	return l;
 }
 
-void parseSource(char *src, char *lexemeList);
-void trim(char *str);
+void parseSource(char *src, lexeme *list);
+char *trim(char *str);
 bool isIdentifier(char *str);
 bool isNumber(char *str);
+void isReserved(char *str);
+bool issymbol(char c);
 
 // gets rid of comments by overwriting all character within the comments and the
 // comment markers themselves
-void trim(char *str)
+char *trim(char *str)
 {
   int lp = 0, rp, diff, i, len = strlen(str);
+  i=0;
+  char trimmed[MAX_CODE_LENGTH];
+
   while (str[lp] != '\0')
   {
+
     if (str[lp] == '/' && str[lp + 1] == '*')
     {
       rp = lp + 2;
@@ -57,41 +63,147 @@ void trim(char *str)
       {
         rp++;
       }
-      rp += 2;
-
-      diff = rp - lp;
-      for (i = 0; i < diff; i++)
-      {
-        str[lp + i] = str[rp + i + 1];
-      }
+      //rp += 2; // rp = rp + 2
+      lp= rp+2;
     }
+    trimmed[i] = str[lp];
+    i++;
     lp++;
   }
-  // printf("\nTrimmed input:\n%s\n", str);
+  printf("\nTrimmed input:\n*%s*\n", trimmed);
+  return;
 }
 
 // checks for errors and prints tokenized output
-void parseSource(char *src, char *lexemeList)
+void parseSource(char *src, lexeme *list)
+{
+  char buffer[MAX_CODE_LENGTH];
+  int i=0, j = 0;
+  while(src[i] != '\0')
+  {
+    if(isalpha(src[i]) == false && isdigit(src[i]) == false && !issymbol(src[i]) && !isspace(src[i]))
+    {
+      printf("invalid symbol\n");
+      return;
+    }
+    i++;
+
+  }
+
+  i=0;
+  // capturing substring to be evaluated
+  while(src[i] != '\0')
+  {
+    if(isspace(src[i]))
+    {
+      i++;
+    }
+    if(isalpha(src[i]) || isdigit(src[i]))
+    {
+      while (!issymbol(src[i]))
+      {
+        buffer[j++] = src[i++];
+      }
+    }
+
+    // evaluating substring
+    if (isReserved(buffer))
+    {
+      if (strcmp(buffer, "const") == 0)
+      {
+        // read further in the string for number to be evaluated
+
+      }
+      if (strcmp(buffer, "var") == 0)
+      {
+        // var stuff
+      }
+      if (strcmp(buffer, "procedure") == 0)
+      {
+
+      }
+      if (strcmp(buffer, "call") == 0)
+      {
+
+      }
+      if (strcmp(buffer, "begin") == 0)
+      {
+
+      }
+      if (strcmp(buffer, "end") == 0)
+      {
+
+      }
+      if (strcmp(buffer, "if") == 0)
+      {
+
+      }
+      if (strcmp(buffer, "then") == 0)
+      {
+
+      }
+      if (strcmp(buffer, "else") == 0)
+      {
+
+      }
+      if (strcmp(buffer, "while") == 0)
+      {
+
+      }
+      if (strcmp(buffer, "do") == 0)
+      {
+
+      }
+      if (strcmp(buffer, "read") == 0)
+      {
+
+      }
+      if (strcmp(buffer, "write") == 0)
+      {
+
+      }
+      if (strcmp(buffer, "odd") == 0)
+      {
+
+      }
+    }
+  }
+
+
+bool issymbol(char c)
 {
   // Table of special symbols
   char symbols[13] = { '+', '-', '*', '/', '(', ')', '=', ',', '.', '<', '>', ';',
                        ':' };
 
-  while ()
+
+  for(int i=0; i<13; i++)
+  {
+    if(c == symbols[i])
+    {
+        return true;
+    }
+  }
+  return false;
+}
+
+
+isReserved(src);
+  // while ()
 }
 
 // returns true if the string is a valid identifier and false otherwise
 bool isIdentifier(char *str)
 {
   int i = 1, len = strlen(str);
-  if (!isalpha(str[0]) || len > MAX_IDENT_LENGTH)
+  if (!isalpha(str[0]) && len > MAX_IDENT_LENGTH)
   {
     return false;
   }
 
   for (i = 1; i < len; i++)
   {
-    if (!isalpha(str[i]) || !isdigit(str[i]))
+    if (!isalpha(str[i]) && !isdigit(str[i]))
     {
       return false;
     }
@@ -120,102 +232,105 @@ bool isNumber(char *str)
 }
 
 // return true if the string is a reserved keyword and false otherwise
-bool isReserved(char *str)
+void isReserved(char *str)
 {
+  int i=0;
   // Table of reserved word names
   char reserved[14][9] = { "const", "var", "procedure", "call", "begin", "end",
                            "if", "then", "else", "while", "do", "read", "write",
                            "odd" };
-  if (str[0] == 'b')
+while(str[i] != '\0'){
+
+  if(str[i] == 'c' && str[i+1] == 'o' && str[i+2]=='n' && str[i+3] == 's' && str[i+4] == 't')
   {
-    if (strcmp(reserved[4], str) == 0)
-    {
-      return true;
-    }
+    printf("constant\n");
+    // return true;
+
   }
-  if (str[0] == 'c')
+
+  if(str[i] == 'v' && str[i+1] == 'a' && str[i+2]=='r')
   {
-    if (strcmp(reserved[0], str) == 0)
-    {
-      return true;
-    }
-    else if (strcmp(reserved[3], str) == 0)
-    {
-      return true;
-    }
+    printf("var\n");
+    // return true;
   }
-  if (str[0] == 'd')
+
+  if(str[i] == 'p' && str[i+1] == 'r' && str[i+2]=='o' && str[i+3] == 'c' && str[i+4] == 'e' | str[i+5] == 'd' && str[i+6]=='u' && str[i+7] == 'r' && str[i+8] == 'e' )
   {
-    if (strcmp(reserved[10], str) == 0)
-    {
-      return true;
-    }
+    printf("procedure\n");
+    // return true;
   }
-  if (str[0] == 'e')
+
+  if(str[i] == 'c' && str[i+1] == 'a' && str[i+2]=='l' && str[i+3] == 'l')
   {
-    if (strcmp(reserved[5], str) == 0)
-    {
-      return true;
-    }
-    else if (strcmp(reserved[8], str) == 0)
-    {
-      return true;
-    }
+    printf("call\n");
+    // return true;
   }
-  if (str[0] == 'i')
+
+  if(str[i] == 'b' && str[i+1] == 'e' && str[i+2]=='g' && str[i+3] == 'i' && str[i+4] == 'n')
   {
-    if (strcmp(reserved[6], str) == 0)
-    {
-      return true;
-    }
+    printf("begin\n");
+    // return true;
   }
-  if (str[0] == 'o')
+
+  if(str[i] == 'e' && str[i+1] == 'n' && str[i+2]=='d')
   {
-    if (strcmp(reserved[13], str) == 0)
-    {
-      return true;
-    }
+    printf("end\n");
+    // return true;
   }
-  if (str[0] == 'p')
+
+  if(str[i] == 'i' && str[i+1] == 'f' )
   {
-    if (strcmp(reserved[2], str) == 0)
-    {
-      return true;
-    }
+    printf("if\n");
+    // return true;
   }
-  if (str[0] == 'r')
+
+  if(str[i] == 't' && str[i+1] == 'h' && str[i+2]=='e' && str[i+3] == 'n')
   {
-    if (strcmp(reserved[11], str) == 0)
-    {
-      return true;
-    }
+    printf("then\n");
+    // return true;
   }
-  if (str[0] == 't')
+
+  if(str[i] == 'e' && str[i+1] == 'l' && str[i+2]=='s' && str[i+3] == 'e')
   {
-    if (strcmp(reserved[7], str) == 0)
-    {
-      return true;
-    }
+    printf("else\n");
+    // return true;
   }
-  if (str[0] == 'v')
+
+  if(str[i] == 'w' && str[i+1] == 'h' && str[i+2]=='i' && str[i+3] == 'l' && str[i+4] == 'e')
   {
-    if (strcmp(reserved[1], str) == 0)
-    {
-      return true;
-    }
+    printf("while\n");
+    // return true;
   }
-  if (str[0] == 'w')
+
+  if(str[i] == 'd' && str[i+1] == 'o')
   {
-    if (strcmp(reserved[9], str) == 0)
-    {
-      return true;
-    }
-    else if (strcmp(reserved[12], str) == 0)
-    {
-      return true;
-    }
+    printf("do\n");
+    // return true;
   }
-  return false;
+
+  if(str[i] == 'r' && str[i+1] == 'e' && str[i+2]=='a' && str[i+3] == 'd')
+  {
+    printf("read\n");
+    // return true;
+  }
+
+  if(str[i] == 'w' && str[i+1] == 'r' && str[i+2]=='i' && str[i+3] == 't' && str[i+4] == 'e')
+  {
+    printf("write\n");
+    // return true;
+  }
+
+  if(str[i] == 'o' && str[i+1] == 'd' && str[i+2]=='d')
+  {
+    printf("odd\n");
+    // return true;
+  }
+
+  i++;
+
+}
+
+  return;
 }
 
 int main(int argc, char **argv)
@@ -225,16 +340,20 @@ int main(int argc, char **argv)
   // {
   //   printf("%s\n", reserved[i]);
   // }
-  char source[MAX_CODE_LENGTH];
+  char c, source[MAX_CODE_LENGTH];
   lexeme list[MAX_CODE_LENGTH];
   FILE *fp = fopen(argv[1], "r");
   int i = 0;
 
-  // collecting source program from file
+  fscanf(fp, "%c", &c);
   while (!feof(fp))
   {
-    fscanf(fp, "%c", &source[i++]);
+    source[i++] = c;
+    fscanf(fp, "%c", &c);
   }
+  // source[i] = c;
+  fclose(fp);
+
   printf("Source Program:\n%s\n", source);
 
   trim(source);
@@ -242,4 +361,3 @@ int main(int argc, char **argv)
 
   return 0;
 }
-
