@@ -32,6 +32,7 @@ typedef struct lexemes
 void trim(char *str);
 void parse(char *code);
 bool isReserved(char *str);
+token_type Reserved(char *str);
 
 void trim(char *str)
 {
@@ -63,12 +64,19 @@ void trim(char *str)
 void parse(char *code)
 {
   lexeme list[MAX_CODE_LENGTH];
-  lexeme *lptr;
-  int lp = 0, rp, length, i;
+  lexeme *lexptr;
+  int lp = 0, rp, length, i, listIndex;
   char buffer[MAX_CODE_LENGTH];
+  token_type t;
 
+  // looping through string containing input
   while (code[lp] != '\0')
   {
+    // ignoring whitespace
+    if (isspace(code[lp]))
+    {
+      lp++;
+    }
     if (isalpha(code[lp]))
     {
       rp = lp;
@@ -92,9 +100,19 @@ void parse(char *code)
         buffer[i] = code[lp + i];
       }
 
+      // adds reserved words to lexeme array
       if (isReserved(buffer))
       {
-        
+        t = reserved(buffer);
+        lexptr = createLexeme(t, buffer);
+        list[listIndex++] = *lexptr;
+      }
+      // must be a identifier at this line
+      else
+      {
+        t = identsym;
+        lexptr = createLexeme(t, buffer);
+        list[listIndex++] = *lexptr;
       }
     }
     else
@@ -200,6 +218,105 @@ bool isReserved(char *str)
     else if (strcmp(reserved[12], str) == 0)
     {
       return true;
+    }
+  }
+  return false;
+}
+
+token_type Reserved(char *str)
+{
+  // Table of reserved word names
+  char reserved[14][9] = { "const", "var", "procedure", "call", "begin", "end",
+                           "if", "then", "else", "while", "do", "read", "write",
+                           "odd" };
+
+  if (str[0] == 'b')
+  {
+    if (strcmp(reserved[4], str) == 0)
+    {
+      return 21;
+    }
+  }
+  if (str[0] == 'c')
+  {
+    if (strcmp(reserved[0], str) == 0)
+    {
+      return 28;
+    }
+    else if (strcmp(reserved[3], str) == 0)
+    {
+      return 27;
+    }
+  }
+  if (str[0] == 'd')
+  {
+    if (strcmp(reserved[10], str) == 0)
+    {
+      return 26;
+    }
+  }
+  if (str[0] == 'e')
+  {
+    if (strcmp(reserved[5], str) == 0)
+    {
+      return 22;
+    }
+    else if (strcmp(reserved[8], str) == 0)
+    {
+      return 33;
+    }
+  }
+  if (str[0] == 'i')
+  {
+    if (strcmp(reserved[6], str) == 0)
+    {
+      return 23;
+    }
+  }
+  if (str[0] == 'o')
+  {
+    if (strcmp(reserved[13], str) == 0)
+    {
+      return 8;
+    }
+  }
+  if (str[0] == 'p')
+  {
+    if (strcmp(reserved[2], str) == 0)
+    {
+      return 30;
+    }
+  }
+  if (str[0] == 'r')
+  {
+    if (strcmp(reserved[11], str) == 0)
+    {
+      return 32;
+    }
+  }
+  if (str[0] == 't')
+  {
+    if (strcmp(reserved[7], str) == 0)
+    {
+      return 24;
+    }
+  }
+  if (str[0] == 'v')
+  {
+    if (strcmp(reserved[1], str) == 0)
+    {
+      return 29;
+    }
+  }
+  if (str[0] == 'w')
+  {
+    if (strcmp(reserved[9], str) == 0)
+    {
+      return 25;
+    }
+    else if (strcmp(reserved[12], str) == 0)
+    {
+      return 31;
     }
   }
   return false;
