@@ -92,8 +92,7 @@ int parse(char *code, lexeme list[])
       printf("2.5\n");
       lp++;
     }
-
-    if (isalpha(code[lp]))
+    else if (isalpha(code[lp]))
     {
       rp = lp;
 
@@ -117,7 +116,7 @@ int parse(char *code, lexeme list[])
       {
         buffer[i] = code[lp + i];
       }
-      lp += i;
+      lp += i + 2;
 
       // adds reserved words to lexeme array
       if (isReserved(buffer))
@@ -138,11 +137,13 @@ int parse(char *code, lexeme list[])
     {
       rp = lp;
 
+      i = 0;
       // capturing length of substring
-      while (isdigit(code[lp]))
+      while (isdigit(code[lp + i]))
       {
         printf("4\n");
         rp++;
+        i++;
       }
       length = rp - lp;
 
@@ -158,6 +159,7 @@ int parse(char *code, lexeme list[])
       {
         buffer[i] = code[lp + i];
       }
+      lp += i + 2;
 
       t = numbersym;
       lexptr = createLexeme(t, buffer);
@@ -217,6 +219,7 @@ int parse(char *code, lexeme list[])
       {
         t = 20;
       }
+      lp++;
     }
   }
   return listIndex;
@@ -461,7 +464,7 @@ void output(lexeme list[], int count)
   printf("Lexeme Table:\nLexeme\tToken Type\n");
   for (i = 0; i < count; i++)
   {
-    printf("%s\t%d\n", list[i].lexeme, list[i].type);
+    printf("%s \t%d \n", list[i].lexeme, list[i].type);
   }
 }
 
