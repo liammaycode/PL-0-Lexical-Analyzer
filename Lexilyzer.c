@@ -39,7 +39,7 @@ lexeme *createLexeme(token_type t, char *str)
 
 // gets rid of comments by overwriting all character within the comments and the
 // comment markers themselves
-char *trim(char *str)
+void trim(char *str)
 {
   int lp = 0, rp, diff, i, len = strlen(str);
   i=0;
@@ -66,26 +66,75 @@ char *trim(char *str)
   return;
 }
 
-void parse(char *str, lexeme list[])
+int parse(char *str, lexeme list[])
 {
-  int i = 0, j = 0;
+  int i = 0, j = 0, k = 0, diff, x, length = 0;
   // Table of reserved word names
   char reserved[14][9] = { "const", "var", "procedure", "call", "begin", "end",
                            "if", "then", "else", "while", "do", "read", "write",
                            "odd" };
+  char buffer[MAX_CODE_LENGTH];
   lexeme *l;
   while(str[i] != '\0')
   {
+    // const
     if(str[i] == 'c' && str[i+1] == 'o' && str[i+2]=='n' && str[i+3] == 's' && str[i+4] == 't')
     {
       l = createLexeme(constsym, "const");
-      list[j++] = l;
+      list[j++] = *l;
       // loop through whitespace
       i += 5;
       while (!isspace(str[i++]));
       // capture identifier (and make sure it's valid)
-      // capture identifier value (and make sure it's valid)
-      // also capturing symbols
+      if (isalpha(str[i]))
+      {
+        // capture identifier as substring and put in list
+        i = k;
+        while (!symboltable(str[k++]))
+        {
+          if (!isspace(str[k]))
+          {
+            length++;
+          }
+        }
+        if ((length) > MAX_IDENT_LENGTH)
+        {
+          printf("Err: number too long\n");
+          return 0;
+        }
+        // copying array into buffer
+        k = i;
+        for (x = 0; x < length; x++)
+        {
+          buffer[x] = str[k++];
+        }
+        str[k] = '\0';
+        l = createLexeme(identsym, buffer);
+        list[j++] = *l;
+      }
+      else
+      {
+        printf("Err: invalid identifier\n");
+        return 0;
+      }
+
+      // capture identifier value
+      i = k;
+      while (!isspace(str[i++]));
+      k = i;
+      while (isdigit(str[k++]));
+      length = k - i;
+      if (length > MAX_NUM_LENGTH)
+      {
+        printf("Err: number too long\n");
+        return 0;
+      }
+      for (x = 0; x < length; x++)
+      {
+        buffer[x] = str[i++];
+      }
+      l = createLexeme(numbersym, buffer);
+      list[j++] = *l;
     }
 
     if(str[i] == 'v' && str[i+1] == 'a' && str[i+2]=='r')
@@ -165,7 +214,7 @@ void parse(char *str, lexeme list[])
       // return true;
     }
   }
-  return;
+  return 1;
 }
 
 int main(int argc, char **argv)
