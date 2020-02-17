@@ -1,3 +1,104 @@
+token_type Reserved(char *str)
+{
+  // Table of reserved word names
+  char reserved[14][9] = { "const", "var", "procedure", "call", "begin", "end",
+                           "if", "then", "else", "while", "do", "read", "write",
+                           "odd" };
+
+  if (str[0] == 'b')
+  {
+    if (strcmp(reserved[4], str) == 0)
+    {
+      return 21;
+    }
+  }
+  if (str[0] == 'c')
+  {
+    if (strcmp(reserved[0], str) == 0)
+    {
+      return 28;
+    }
+    else if (strcmp(reserved[3], str) == 0)
+    {
+      return 27;
+    }
+  }
+  if (str[0] == 'd')
+  {
+    if (strcmp(reserved[10], str) == 0)
+    {
+      return 26;
+    }
+  }
+  if (str[0] == 'e')
+  {
+    if (strcmp(reserved[5], str) == 0)
+    {
+      return 22;
+    }
+    else if (strcmp(reserved[8], str) == 0)
+    {
+      return 33;
+    }
+  }
+  if (str[0] == 'i')
+  {
+    if (strcmp(reserved[6], str) == 0)
+    {
+      return 23;
+    }
+  }
+  if (str[0] == 'o')
+  {
+    if (strcmp(reserved[13], str) == 0)
+    {
+      return 8;
+    }
+  }
+  if (str[0] == 'p')
+  {
+    if (strcmp(reserved[2], str) == 0)
+    {
+      return 30;
+    }
+  }
+  if (str[0] == 'r')
+  {
+    if (strcmp(reserved[11], str) == 0)
+    {
+      return 32;
+    }
+  }
+  if (str[0] == 't')
+  {
+    if (strcmp(reserved[7], str) == 0)
+    {
+      return 24;
+    }
+  }
+  if (str[0] == 'v')
+  {
+    if (strcmp(reserved[1], str) == 0)
+    {
+      return 29;
+    }
+  }
+  if (str[0] == 'w')
+  {
+    if (strcmp(reserved[9], str) == 0)
+    {
+      return 25;
+    }
+    else if (strcmp(reserved[12], str) == 0)
+    {
+      return 31;
+    }
+  }
+  return false;
+}
+
+
+-----------------------------------------
 FILE *fp;
   fp = fopen("input.txt", "r");
   char aSingleLine[MAX_CODE_LENGTH];
