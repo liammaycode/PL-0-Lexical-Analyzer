@@ -30,9 +30,22 @@ typedef struct lexemes
 }lexeme;
 
 void trim(char *str);
-void parse(char *code);
+int parse(char *code, lexeme list[]);
 bool isReserved(char *str);
-token_type Reserved(char *str);
+token_type reserved(char *str);
+lexeme *createLexeme(token_type t, char *str);
+bool isNumber(char *str);
+bool isSymbol(char symbol);
+void output(lexeme list[], int count);
+
+lexeme *createLexeme(token_type t, char *str)
+{
+	// calloc() initializes the 'left' and 'right' pointers to NULL for us.
+	lexeme *l = malloc(1 * sizeof(lexeme));
+	l->type = t;
+  l->lexeme = str;
+	return l;
+}
 
 void trim(char *str)
 {
@@ -61,28 +74,33 @@ void trim(char *str)
   return;
 }
 
-void parse(char *code)
+int parse(char *code, lexeme list[])
 {
-  lexeme list[MAX_CODE_LENGTH];
   lexeme *lexptr;
-  int lp = 0, rp, length, i, listIndex;
+  int lp = 0, rp, length, i, listIndex = 0;
   char buffer[MAX_CODE_LENGTH];
   token_type t;
 
+  printf("1\n");
   // looping through string containing input
   while (code[lp] != '\0')
   {
+    printf("2\n");
     // ignoring whitespace
     if (isspace(code[lp]))
     {
+      printf("2.5\n");
       lp++;
     }
+
     if (isalpha(code[lp]))
     {
       rp = lp;
+
       // capturing length of substring
-      while (isalpha(code[lp]) || isdigit(code[lp]))
+      while (isalpha(code[rp]) || isdigit(code[rp]))
       {
+        printf("3\n");
         rp++;
       }
       length = rp - lp;
@@ -91,7 +109,7 @@ void parse(char *code)
       if (length > MAX_IDENT_LENGTH)
       {
         printf("Err: ident length too long\n");
-        return;
+        return 0;
       }
 
       // creating substring
@@ -99,6 +117,7 @@ void parse(char *code)
       {
         buffer[i] = code[lp + i];
       }
+      lp += i;
 
       // adds reserved words to lexeme array
       if (isReserved(buffer))
@@ -115,12 +134,126 @@ void parse(char *code)
         list[listIndex++] = *lexptr;
       }
     }
-    else
+    else if (isdigit(code[lp]))
     {
-      // err
+      rp = lp;
+
+      // capturing length of substring
+      while (isdigit(code[lp]))
+      {
+        printf("4\n");
+        rp++;
+      }
+      length = rp - lp;
+
+      // checking for ident length error
+      if (length > MAX_NUM_LENGTH)
+      {
+        printf("Err: number length too long\n");
+        return 0;
+      }
+
+      // creating substring
+      for (i = 0; i < length; i++)
+      {
+        buffer[i] = code[lp + i];
+      }
+
+      t = numbersym;
+      lexptr = createLexeme(t, buffer);
+      list[listIndex++] = *lexptr;
+    }
+    else if (isSymbol(code[lp]))
+    {
+      if (code[lp] == '+')
+      {
+        t = 4;
+      }
+      if (code[lp] == '-')
+      {
+        t = 5;
+      }
+      if (code[lp] == '*')
+      {
+        t = 6;
+      }
+      if (code[lp] == '/')
+      {
+        t = 7;
+      }
+      if (code[lp] == '(')
+      {
+        t = 15;
+      }
+      if (code[lp] == ')')
+      {
+        t = 16;
+      }
+      if (code[lp] == '=')
+      {
+        t = 9;
+      }
+      if (code[lp] == ',')
+      {
+        t = 17;
+      }
+      if (code[lp] == '.')
+      {
+        t = 19;
+      }
+      if (code[lp] == '<')
+      {
+        t = 11;
+      }
+      if (code[lp] == '>')
+      {
+        t = 13;
+      }
+      if (code[lp] == ';')
+      {
+        t = 18;
+      }
+      if (code[lp] == ':')
+      {
+        t = 20;
+      }
+    }
+  }
+  return listIndex;
+}
+
+bool isSymbol(char symbol)
+{
+  char validsymbols[13] = {'+', '-', '*', '/', '(', ')', '=', ',', '.', '<', '>',  ';', ':'};
+
+  for(int i=0; i<13; i++)
+  {
+    if(symbol == validsymbols[i])
+    {
+      return 1;
     }
   }
 
+  return 0;
+}
+
+// return true if string is a valid number and false otherwise
+bool isNumber(char *str)
+{
+  int i, len = strlen(str);
+
+  if (len > MAX_NUM_LENGTH)
+  {
+    return false;
+  }
+  for (i = 0; i < len; i++)
+  {
+    if (!isdigit(str[i]))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 // return true if the string is a reserved keyword and false otherwise
@@ -223,7 +356,7 @@ bool isReserved(char *str)
   return false;
 }
 
-token_type Reserved(char *str)
+token_type reserved(char *str)
 {
   // Table of reserved word names
   char reserved[14][9] = { "const", "var", "procedure", "call", "begin", "end",
@@ -322,11 +455,23 @@ token_type Reserved(char *str)
   return false;
 }
 
+void output(lexeme list[], int count)
+{
+  int i = 0;
+  printf("Lexeme Table:\nLexeme\tToken Type\n");
+  for (i = 0; i < count; i++)
+  {
+    printf("%s\t%d\n", list[i].lexeme, list[i].type);
+  }
+}
+
 int main(int argc, char **argv)
 {
   FILE *fp;
   fp = fopen(argv[1], "r");
   char aSingleLine[MAX_CODE_LENGTH], code[MAX_CODE_LENGTH] = {'\0'};
+  lexeme list[MAX_CODE_LENGTH] = {'\0'};
+  int count;
 
   while(!feof(fp))
   {
@@ -336,6 +481,13 @@ int main(int argc, char **argv)
   printf("Input:\n%s\n", code);
 
   trim(code);
+  count = parse(code, list);
+  if (count < 1)
+  {
+    printf("err\n");
+    return 0;
+  }
+  output(list, count);
 
   fclose(fp);
   return 0;
