@@ -1,3 +1,17 @@
+FILE *fp;
+  fp = fopen("input.txt", "r");
+  char aSingleLine[MAX_CODE_LENGTH];
+
+  while(!feof(fp))
+  {
+    fgets(aSingleLine, MAX_CODE_LENGTH, fp);
+    puts(aSingleLine);
+  }
+
+  fclose(fp);
+  return 0;
+
+///////////////////////////////////////////////////////
 bool symboltable(char symbol)
 {
   char validsymbols[13] = {'+', '-', '*', '/', '(', ')', '=', ',', '.', '<', '>',  ';', ':'};
