@@ -29,7 +29,7 @@ typedef struct lexemes
   char *lexeme;
 }lexeme;
 
-void trim(char *str);
+char* trim(char *str);
 int parse(char *code, lexeme list[]);
 bool isReserved(char *str);
 token_type reserved(char *str);
@@ -43,15 +43,16 @@ lexeme *createLexeme(token_type t, char *str)
 	// calloc() initializes the 'left' and 'right' pointers to NULL for us.
 	lexeme *l = malloc(1 * sizeof(lexeme));
 	l->type = t;
-  l->lexeme = str;
+  l->lexeme = malloc(sizeof(char) * MAX_IDENT_LENGTH);
+  strcpy(l->lexeme, str);
 	return l;
 }
 
-void trim(char *str)
+char* trim(char *str)
 {
   int lp = 0, rp, diff, i, len = strlen(str);
   i=0;
-  char trimmed[MAX_CODE_LENGTH];
+  char *trimmed = malloc(sizeof(char) * MAX_CODE_LENGTH);
 
   while (str[lp] != '\0')
   {
@@ -64,14 +65,14 @@ void trim(char *str)
         rp++;
       }
       //rp += 2; // rp = rp + 2
-      lp= rp+2;
+      lp= rp;
     }
     trimmed[i] = str[lp];
     i++;
     lp++;
   }
   // printf("\nTrimmed input:\n*%s*\n", trimmed);
-  return;
+  return trimmed;
 }
 
 int parse(char *code, lexeme list[])
@@ -116,7 +117,7 @@ int parse(char *code, lexeme list[])
         buffer[i] = code[lp + i];
       }
       buffer[i] = '\0';
-      lp += i + 1;
+      lp = rp;
       printf("\nsubstring *%s* recorded\n\n", buffer);
 
       // adds reserved words to lexeme array
@@ -163,7 +164,7 @@ int parse(char *code, lexeme list[])
         buffer[i] = code[lp + i];
       }
       buffer[i] = '\0';
-      lp += i + 1;
+      lp = rp;
       printf("\nsubstring *%s* recorded\n\n", buffer);
 
       t = numbersym;
@@ -171,6 +172,7 @@ int parse(char *code, lexeme list[])
       lexptr = createLexeme(t, buffer);
       list[listIndex++] = *lexptr;
     }
+    //create an lexeme for the symbol//call createlex w t and sym
     else if (isSymbol(code[lp]))
     {
       if (code[lp] == '+')
@@ -225,6 +227,12 @@ int parse(char *code, lexeme list[])
       {
         t = 20;
       }
+
+      buffer[0] = code[lp];
+      buffer[1] = '\0';
+      lexptr = createLexeme(t, buffer);
+      list[listIndex++] = *lexptr;
+
       lp++;
     }
   }
@@ -488,7 +496,7 @@ int main(int argc, char **argv)
   }
   printf("Input:\n%s\n", code);
 
-  trim(code);
+  strcpy(code, trim(code));
   count = parse(code, list);
   // if (count < 1)
   // {
