@@ -85,6 +85,7 @@ int parse(char *code, lexeme list[])
   // looping through string containing input
   while (code[lp] != '\0')
   {
+    int a = 0;
     // ignoring whitespace
     if (isspace(code[lp]))
     {
@@ -98,11 +99,11 @@ int parse(char *code, lexeme list[])
       // capturing length of substring
       while (isalpha(code[rp]) || isdigit(code[rp]))
       {
-        printf("character %c at code[%d] is alphanumeric\n", code[rp], rp);
+        //printf("character %c at code[%d] is alphanumeric\n", code[rp], rp);
         rp++;
       }
       length = rp - lp;
-      printf("length of string to be captured: %d\n", length);
+      //printf("length of string to be captured: %d\n", length);
 
       // checking for ident length error
       if (length > MAX_IDENT_LENGTH)
@@ -118,13 +119,13 @@ int parse(char *code, lexeme list[])
       }
       buffer[i] = '\0';
       lp = rp;
-      printf("\nsubstring *%s* recorded\n\n", buffer);
+      //printf("\nsubstring *%s* recorded\n\n", buffer);
 
       // adds reserved words to lexeme array
       if (isReserved(buffer))
       {
         t = reserved(buffer);
-        printf("\n(125) creating lexeme for %s\n\n", buffer);
+        //printf("\n(125) creating lexeme for %s\n\n", buffer);
         lexptr = createLexeme(t, buffer);
         list[listIndex++] = *lexptr;
       }
@@ -132,7 +133,7 @@ int parse(char *code, lexeme list[])
       else
       {
         t = identsym;
-        printf("\n(133) creating lexeme for %s\n\n", buffer);
+        //printf("\n(133) creating lexeme for %s\n\n", buffer);
         lexptr = createLexeme(t, buffer);
         list[listIndex++] = *lexptr;
       }
@@ -145,7 +146,7 @@ int parse(char *code, lexeme list[])
       // capturing length of substring
       while (isdigit(code[lp + i]))
       {
-        printf("traversing number...\n");
+        //printf("traversing number...\n");
         rp++;
         i++;
       }
@@ -165,10 +166,10 @@ int parse(char *code, lexeme list[])
       }
       buffer[i] = '\0';
       lp = rp;
-      printf("\nsubstring *%s* recorded\n\n", buffer);
+      //printf("\nsubstring *%s* recorded\n\n", buffer);
 
       t = numbersym;
-      printf("\n(167) creating lexeme for %s\n\n", buffer);
+      //printf("\n(167) creating lexeme for %s\n\n", buffer);
       lexptr = createLexeme(t, buffer);
       list[listIndex++] = *lexptr;
     }
@@ -213,10 +214,26 @@ int parse(char *code, lexeme list[])
       }
       if (code[lp] == '<')
       {
+        if(code[lp+1] == '>')
+        {
+          t = 10;
+          a=1;
+        }
+
+        if(code[lp+1] == '=')
+        {
+          t = 12;
+          a=1;
+        }
         t = 11;
       }
       if (code[lp] == '>')
       {
+        if(code[lp+1] == '=')
+        {
+          t = 14;
+          a=1;
+        }
         t = 13;
       }
       if (code[lp] == ';')
@@ -225,13 +242,24 @@ int parse(char *code, lexeme list[])
       }
       if (code[lp] == ':')
       {
+        if(code[lp+1] == '=')
+        {
+          t = 20;
+          a=1;
+        }
         t = 20;
       }
 
+
       buffer[0] = code[lp];
       buffer[1] = '\0';
+      /*if(a=1)
+      {
+        buffer[0] = code[lp+1];
+      }*/
       lexptr = createLexeme(t, buffer);
       list[listIndex++] = *lexptr;
+
 
       lp++;
     }
@@ -479,6 +507,17 @@ void output(lexeme list[], int count)
   {
     printf("%s\t\t%d\n", list[i].lexeme, list[i].type);
   }
+
+  printf("\nLexeme List:\n");
+  for(int i=0; i<count; i++)
+  {
+    printf("%d ", list[i].type);
+    if(list[i].type == 2 || list[i].type == 3)
+    {
+      printf("%s ", list[i].lexeme);
+    }
+  }
+  printf("\n");
 }
 
 int main(int argc, char **argv)
@@ -489,6 +528,8 @@ int main(int argc, char **argv)
   lexeme list[MAX_CODE_LENGTH] = {'\0'};
   int count;
 
+  printf("hello.");
+
   while(!feof(fp))
   {
     fgets(aSingleLine, MAX_CODE_LENGTH, fp);
@@ -498,11 +539,6 @@ int main(int argc, char **argv)
 
   strcpy(code, trim(code));
   count = parse(code, list);
-  // if (count < 1)
-  // {
-  //   printf("err\n");
-  //   return 0;
-  // }
   output(list, count);
 
   fclose(fp);
