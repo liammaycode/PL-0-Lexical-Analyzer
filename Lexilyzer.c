@@ -65,7 +65,7 @@ char* trim(char *str)
         rp++;
       }
       //rp += 2; // rp = rp + 2
-      lp= rp;
+      lp= rp+2;
     }
     trimmed[i] = str[lp];
     i++;
@@ -85,6 +85,7 @@ int parse(char *code, lexeme list[])
   // looping through string containing input
   while (code[lp] != '\0')
   {
+    int a = 0;
     // ignoring whitespace
     if (isspace(code[lp]))
     {
@@ -211,28 +212,60 @@ int parse(char *code, lexeme list[])
       {
         t = 19;
       }
+        ////////////////////////////////////////////////////////////////////
+          ////////////////////////////////////////////////////////////////////
       if (code[lp] == '<')
       {
-        t = 11;
+        t=11;
+        if(code[lp+1] == '>')
+        {
+          t = 10;
+          a=1;
+        }
+
+        if(code[lp+1] == '=')
+        {
+          t = 12;
+          a=1;
+        }
+
       }
+        ////////////////////////////////////////////////////////////////////
       if (code[lp] == '>')
       {
-        t = 13;
+        t=13;
+        if(code[lp+1] == '=')
+        {
+          t = 14;
+          a=1;
+        }
+
       }
       if (code[lp] == ';')
       {
         t = 18;
       }
+      ////////////////////////////////////////////////////////////////////
       if (code[lp] == ':')
       {
+        if(code[lp+1] == '=')
+        {
+          t = 20;
+          a=1;
+        }
         t = 20;
       }
 
+
       buffer[0] = code[lp];
-      buffer[1] = '\0';
+      buffer[2] = '\0';
+      if(a=1)
+      {
+        buffer[1] = code[lp+1];
+        lp++;
+      }
       lexptr = createLexeme(t, buffer);
       list[listIndex++] = *lexptr;
-
       lp++;
     }
   }
@@ -496,9 +529,11 @@ int main(int argc, char **argv)
 {
   FILE *fp;
   fp = fopen(argv[1], "r");
-  char aSingleLine[MAX_CODE_LENGTH], code[MAX_CODE_LENGTH] = {'\0'};
+  char aSingleLine[MAX_CODE_LENGTH], code[MAX_CODE_LENGTH] = " ";
   lexeme list[MAX_CODE_LENGTH] = {'\0'};
   int count;
+
+
 
   while(!feof(fp))
   {
@@ -506,6 +541,7 @@ int main(int argc, char **argv)
     strcat(code, aSingleLine);
   }
   printf("Input:\n%s\n", code);
+  //printf("breaker"\n);
 
   strcpy(code, trim(code));
   count = parse(code, list);
