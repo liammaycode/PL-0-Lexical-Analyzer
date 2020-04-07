@@ -529,19 +529,22 @@ int main(int argc, char **argv)
 {
   FILE *fp;
   fp = fopen(argv[1], "r");
-  char aSingleLine[MAX_CODE_LENGTH], code[MAX_CODE_LENGTH] = " ";
+  char line[MAX_CODE_LENGTH], aSingleLine[MAX_CODE_LENGTH], code[MAX_CODE_LENGTH] = " ";
   lexeme list[MAX_CODE_LENGTH] = {'\0'};
   int count;
 
 
 
-  while(!feof(fp))
+  printf("Input:\n");
+
+
+
+  while(fgets(aSingleLine, MAX_CODE_LENGTH, fp))
   {
-    fgets(aSingleLine, MAX_CODE_LENGTH, fp);
+    printf("%s", aSingleLine);
     strcat(code, aSingleLine);
   }
-  printf("Input:\n%s\n", code);
-  //printf("breaker"\n);
+
 
   strcpy(code, trim(code));
   count = parse(code, list);
